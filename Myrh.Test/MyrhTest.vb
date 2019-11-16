@@ -185,7 +185,7 @@ Imports SimpleTexUnicode
         Quantity.Define("mass", "m", Unit.Parse("kg"), Nothing)
         Quantity.Define("time", "t", Unit.Parse("s"), Nothing)
 
-        Dim test_string As String = "(length)^-1 (mass)²·t -12.3 * 10² m^-1 (kilogramm)^2*s"
+        Dim test_string As String = "(length)^-1 (mass)²·t (-12.3 * 10² + -23*i) m^-1 (kilogramm)^2*s"
         Dim retval As Object = Value.Parse(test_string)
         Debug.Print(retval.ToString)
 

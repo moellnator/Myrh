@@ -1,5 +1,4 @@
 ﻿Imports Myrh.Entities
-Imports SimpleTexUnicode
 
 Namespace Values.Scalars
 
@@ -68,7 +67,7 @@ Namespace Values.Scalars
         End Function
 
         Protected Overrides Function _FormatValue() As String
-            Return Formatting.Scientific(Me._internal)
+            Return Formatting.ToScientific(Me._internal)
         End Function
 
         Public Overrides Function Scale(Of U As Scalar(Of U), V As Value(Of V))(byValue As U) As V
@@ -141,23 +140,7 @@ Namespace Values.Scalars
         End Function
 
         Protected Overrides Function _Parse(text As String, quantity As Quantity, unit As Unit) As Object
-            Dim v As Double = 0
-            If text.Contains(" ") Or text.Contains("*") Or text.Contains("×") Then
-                Dim vp As String() = text.Split({"*"c, "×"c})
-                Dim exp As Double
-                v = Val(vp.First)
-                If text.Contains("^") Then
-                    exp = Val(vp.Last.Split("^").Last)
-                Else
-                    Dim super As String = "⁻⁺⁰˙¹²³⁴⁵⁶⁷⁸⁹"
-                    Dim super_map As String = "-+0.123456789"
-                    Dim f_map As Func(Of String, String) = Function(s) New String(s.Select(Function(c) super_map(super.IndexOf(c))).ToArray)
-                    exp = Val(f_map(text.Substring(text.IndexOf("10") + 2)))
-                End If
-                v *= 10 ^ exp
-            Else
-                v = Val(text)
-            End If
+            Dim v As Double = Formatting.FromScientific(text)
             Dim retval As Real = Nothing
             If quantity IsNot Nothing Then
                 If unit IsNot Nothing Then

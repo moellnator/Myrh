@@ -1,8 +1,11 @@
 ﻿Imports Myrh.Entities
 
 Namespace Values.Scalars
+
+    <Value(Complex.Match)>
     Public Class Complex : Inherits Scalar(Of Complex)
 
+        Public Const Match As String = "((\(" & Real.Match & "[ ]*[+-][ ]*" & Real.Match & "[ ]*[\*·]?[i𝑖]\))|(" & Real.Match & "[ ]*[\*·]?[i𝑖]" & "))"
         Private ReadOnly _real As Double
         Private ReadOnly _imag As Double
 
@@ -161,13 +164,14 @@ Namespace Values.Scalars
                 If Me._imag = 0 Then
                     Return "0"
                 Else
-                    Return Formatting.Scientific(Me._imag) & "𝑖"
+                    Return Formatting.ToScientific(Me._imag) & "𝑖"
                 End If
             Else
                 If Me._imag = 0 Then
-                    Return Formatting.Scientific(Me._real)
+                    Return Formatting.ToScientific(Me._real)
                 Else
-                    Return "(" & Formatting.Scientific(Me._real) & " + " & Formatting.Scientific(Me._imag) & "𝑖)"
+                    Return "(" & Formatting.ToScientific(Me._real) & " " & If(Math.Sign(Me._imag) = "1", "+", "-") & " " &
+                        Formatting.ToScientific(Math.Abs(Me._imag)) & "𝑖)"
                 End If
             End If
         End Function
@@ -214,7 +218,34 @@ Namespace Values.Scalars
         End Operator
 
         Protected Overrides Function _Parse(text As String, quantity As Quantity, unit As Unit) As Object
-            Throw New NotImplementedException()
+            Dim imag As Double = 0
+            Dim real As Double = 0
+            Dim sign As Integer = 1
+            If text.Contains("(") Then
+                text = text.Trim("("c, ")"c)
+                Dim m As Text.RegularExpressions.Match = New Text.RegularExpressions.Regex(Scalars.Real.Match).Match("^" & text)
+                real = Formatting.FromScientific(m.ToString)
+                text = text.Substring(m.Length).Trim
+                sign = If(text(0) = "-"c, -1, 1)
+                text = text.Substring(1).Trim
+            End If
+            text = text.Trim(" ", "*", "·", "i", "𝑖")
+            imag = Formatting.FromScientific(text) * sign
+            Dim retval As Complex = Nothing
+            If quantity IsNot Nothing Then
+                If unit IsNot Nothing Then
+                    retval = New Complex(quantity, real, imag, unit)
+                Else
+                    retval = New Complex(quantity, real, imag)
+                End If
+            Else
+                If unit IsNot Nothing Then
+                    retval = New Complex(real, imag, unit)
+                Else
+                    retval = New Complex(real, imag)
+                End If
+            End If
+            Return retval
         End Function
 
     End Class
