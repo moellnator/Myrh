@@ -1,4 +1,5 @@
-﻿
+﻿Option Explicit Off
+
 Imports Myrh.Entities
 Imports Myrh.Values
 Imports Myrh.Values.Scalars
@@ -173,6 +174,21 @@ Imports SimpleTexUnicode
         Next
     End Sub
 
-    'TODO: Value Parse, Uncertainty, Vector, Matrix, Row, Function
+    <TestMethod> Public Sub TestValueParsing()
+        Domain.Current.Reset()
+        Domain.Current.SetDefaultSystem("metric")
+
+        Unit.Define("gramm", "g", Prefix.Kilo, "metric", Dimension.Mass)
+        Unit.Define("meter", "m", Prefix.One, "metric", Dimension.Length)
+        Unit.Define("time", "s", Prefix.One, "metric", Dimension.Length)
+        Quantity.Define("length", "l", Unit.Parse("m"), Nothing)
+        Quantity.Define("mass", "m", Unit.Parse("kg"), Nothing)
+        Quantity.Define("time", "t", Unit.Parse("s"), Nothing)
+
+        Dim test_string As String = "(length)^-1 (mass)²·t -12.3 * 10² m^-1 (kilogramm)^2*s"
+        Dim retval As Object = Value.Parse(test_string)
+        Debug.Print(retval.ToString)
+
+    End Sub
 
 End Class

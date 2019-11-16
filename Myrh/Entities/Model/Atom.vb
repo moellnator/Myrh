@@ -1,11 +1,16 @@
 ﻿Namespace Entities.Model
     Public Class Atom(Of T As Compound(Of T)) : Implements INamed, IEquatable(Of Compound(Of T)), IEquatable(Of Atom(Of T)), IEnumerable(Of Component(Of T))
 
+        Private Shared ReadOnly _ForbiddenName As New Text.RegularExpressions.Regex("[\w-[\P{Nd}]]*")
+        Private Shared ReadOnly _ForbiddenSymbol As New Text.RegularExpressions.Regex("[\P{L}]*")
+
         Public Overridable ReadOnly Property Name As String Implements INamed.Name
         Public Overridable ReadOnly Property Symbol As String Implements INamed.Symbol
 
         Public Sub New(name As String, symbol As String)
+            If Not _ForbiddenName.IsMatch(name) Then Throw New ArgumentException($"Invalid name: {name}.")
             Me.Name = If(name <> "", "(" & name & ")", "")
+            If Not _ForbiddenSymbol.IsMatch(symbol) Then Throw New ArgumentException($"Invalid symbol: {symbol}.")
             Me.Symbol = symbol
         End Sub
 

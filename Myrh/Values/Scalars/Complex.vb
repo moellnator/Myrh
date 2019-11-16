@@ -172,7 +172,7 @@ Namespace Values.Scalars
             End If
         End Function
 
-        Protected Overrides Function MakeEntity(quantity As Quantity, link As Link) As Value(Of Scalar(Of Complex))
+        Protected Overrides Function MakeEntity(quantity As Quantity, link As Link) As Value
             Return New Complex(Me.Quantity, Me._real * link.Scaling, Me._imag * link.Scaling, link.Target)
         End Function
 
@@ -212,6 +212,10 @@ Namespace Values.Scalars
         Public Shared Operator <>(a As Complex, b As Complex) As Boolean
             Return Not a = b
         End Operator
+
+        Protected Overrides Function _Parse(text As String, quantity As Quantity, unit As Unit) As Object
+            Throw New NotImplementedException()
+        End Function
 
     End Class
 

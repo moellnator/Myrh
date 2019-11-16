@@ -100,6 +100,7 @@
     <Compile Include="Values\Scalars\Real.vb" />
     <Compile Include="Values\Scalars\Scalar.vb" />
     <Compile Include="Values\Value.vb" />
+    <Compile Include="Values\ValueAttribute.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

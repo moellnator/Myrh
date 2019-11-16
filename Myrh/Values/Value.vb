@@ -3,7 +3,66 @@ Imports Myrh.Values.Scalars
 
 Namespace Values
 
-    Public MustInherit Class Value(Of T As Value(Of T)) : Inherits Entity(Of Value(Of T))
+    Public MustInherit Class Value : Inherits Entity(Of Value)
+
+        Private Const PATTERN_COMPOUND As String = "((\([\w-[\p{Nd}]]+\))|([\p{L}]+))(\^([+-]?[0-9]+(\.[0-9]+)?)|([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+(˙[⁰¹²³⁴⁵⁶⁷⁸⁹]+)?))?([ ·\*]((\([\w-[\p{Nd}]]+\))|([\p{L}]+))(\^([+-]?[0-9]+(\.[0-9]+)?)|([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+(˙[⁰¹²³⁴⁵⁶⁷⁸⁹]+)?))?)*"
+        Private Shared ReadOnly MATCH_QUANTITY As New Text.RegularExpressions.Regex("^" & PATTERN_COMPOUND, Text.RegularExpressions.RegexOptions.Compiled)
+        Private Shared ReadOnly MATCH_UNIT As New Text.RegularExpressions.Regex(PATTERN_COMPOUND & "$", Text.RegularExpressions.RegexOptions.Compiled)
+        Private Delegate Function Parser(text As String, quantity As Quantity, unit As Unit) As Object
+        Private Shared ReadOnly MATCH_VALUE As Tuple(Of Text.RegularExpressions.Regex, Parser)() =
+            GetType(Value).Assembly.GetTypes.Where(
+                Function(t) t.GetCustomAttributes(False).Any(Function(a) TypeOf a Is ValueAttribute)
+            ).Select(
+                Function(t) New Tuple(Of Text.RegularExpressions.Regex, Parser)(
+                    New Text.RegularExpressions.Regex(
+                        "^" & DirectCast(t.GetCustomAttributes(GetType(ValueAttribute), False).First, ValueAttribute).Pattern & "$",
+                        Text.RegularExpressions.RegexOptions.Compiled
+                    ),
+                    [Delegate].CreateDelegate(
+                        GetType(Parser),
+                        Activator.CreateInstance(t),
+                        t.GetMethod("_Parse", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance)
+                    )
+                )
+            ).ToArray
+
+        Public Sub New()
+            MyBase.New(Quantity.None)
+        End Sub
+
+        Public Sub New(unit As Unit)
+            MyBase.New(unit)
+        End Sub
+
+        Public Sub New(quantity As Quantity)
+            MyBase.New(quantity)
+        End Sub
+
+        Public Sub New(quantity As Quantity, unit As Unit)
+            MyBase.New(quantity, unit)
+        End Sub
+
+        Public Shared Function Parse(text As String) As Object
+            Dim q As Quantity = Nothing
+            If MATCH_QUANTITY.IsMatch(text) Then
+                Dim m As Text.RegularExpressions.Match = MATCH_QUANTITY.Match(text)
+                q = Quantity.Parse(m.ToString)
+                text = text.Substring(m.Length).Trim
+            End If
+            Dim u As Unit = Nothing
+            If MATCH_UNIT.IsMatch(text) Then
+                Dim m As Text.RegularExpressions.Match = MATCH_UNIT.Match(text)
+                u = Unit.Parse(m.ToString)
+                text = text.Substring(0, text.Count - m.Length).Trim
+            End If
+            Return MATCH_VALUE.First(Function(p) p.Item1.IsMatch(text)).Item2(text, q, u)
+        End Function
+
+        Protected MustOverride Function _Parse(text As String, quantity As Quantity, unit As Unit) As Object
+
+    End Class
+
+    Public MustInherit Class Value(Of T As Value(Of T)) : Inherits Value
 
         Public Sub New()
             MyBase.New(Quantity.None)

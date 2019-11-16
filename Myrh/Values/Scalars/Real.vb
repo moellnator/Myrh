@@ -2,8 +2,11 @@
 Imports SimpleTexUnicode
 
 Namespace Values.Scalars
+
+    <Value(Real.Match)>
     Public Class Real : Inherits Scalar(Of Real)
 
+        Public Const Match As String = "[+-]?[0-9]+(\.[0-9]+)?(([eE][+-]?[0-9]+)|([ ]*[\*·×][ ]*10((\^[+-][0-9]+)|([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+))))?"
         Private ReadOnly _internal As Double
 
         Public Sub New()
@@ -78,7 +81,7 @@ Namespace Values.Scalars
             End If
         End Function
 
-        Protected Overrides Function MakeEntity(quantity As Quantity, link As Link) As Value(Of Scalar(Of Real))
+        Protected Overrides Function MakeEntity(quantity As Quantity, link As Link) As Value
             Return New Real(quantity, Me._internal * link.Scaling, link.Target)
         End Function
 
@@ -135,6 +138,41 @@ Namespace Values.Scalars
             If Not a.Quantity.Equals(b.Quantity) Then Throw New ArgumentException("Cannot compare entities with different quantities.")
             If a.Unit.Equals(b.Unit) Then Return a
             Return b.WithUnit(a.Unit)
+        End Function
+
+        Protected Overrides Function _Parse(text As String, quantity As Quantity, unit As Unit) As Object
+            Dim v As Double = 0
+            If text.Contains(" ") Or text.Contains("*") Or text.Contains("×") Then
+                Dim vp As String() = text.Split({"*"c, "×"c})
+                Dim exp As Double
+                v = Val(vp.First)
+                If text.Contains("^") Then
+                    exp = Val(vp.Last.Split("^").Last)
+                Else
+                    Dim super As String = "⁻⁺⁰˙¹²³⁴⁵⁶⁷⁸⁹"
+                    Dim super_map As String = "-+0.123456789"
+                    Dim f_map As Func(Of String, String) = Function(s) New String(s.Select(Function(c) super_map(super.IndexOf(c))).ToArray)
+                    exp = Val(f_map(text.Substring(text.IndexOf("10") + 2)))
+                End If
+                v *= 10 ^ exp
+            Else
+                v = Val(text)
+            End If
+            Dim retval As Real = Nothing
+            If quantity IsNot Nothing Then
+                If unit IsNot Nothing Then
+                    retval = New Real(quantity, v, unit)
+                Else
+                    retval = New Real(quantity, v)
+                End If
+            Else
+                If unit IsNot Nothing Then
+                    retval = New Real(v, unit)
+                Else
+                    retval = New Real(v)
+                End If
+            End If
+            Return retval
         End Function
 
     End Class
