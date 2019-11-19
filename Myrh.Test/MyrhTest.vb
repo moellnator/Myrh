@@ -185,10 +185,38 @@ Imports SimpleTexUnicode
         Quantity.Define("mass", "m", Unit.Parse("kg"), Nothing)
         Quantity.Define("time", "t", Unit.Parse("s"), Nothing)
 
-        Dim test_string As String = "(length)^-1 (mass)²·t (-12.3 * 10² + -23*i) m^-1 (kilogramm)^2*s"
-        Dim retval As Object = Value.Parse(test_string)
-        Debug.Print(retval.ToString)
+        Dim retval As Object
+        retval = Value.Parse("(length)^-1 (mass)²·t (-12.3 * 10² + -23*i) m^-1 (kilogramm)^2*s")
+        retval = Value.Parse("-12e+2")
+        retval = Value.Parse("-23*i")
+        retval = Value.Parse("(-12.3 * 10² + -23*i) m^-1 (kilogramm)^2*s")
+        retval = Value.Parse("(length)^-1 (mass)²·t 12")
 
+    End Sub
+
+    <TestMethod> Public Sub TestUncertainReal()
+        Domain.Current.Reset()
+        Domain.Current.SetDefaultSystem("metric")
+        Unit.Define("meter", "m", Prefix.One, "metric", Dimension.Length)
+        Quantity.Define("length", "l", Unit.Parse("m"), Nothing)
+
+        Dim u As UReal = Value.Parse("12 m").WithUncertainty(Value.Parse("50 cm"))
+        u = u * u
+        Debug.Print(u.ToString)
+        u = u * 7
+        Debug.Print(u.ToString)
+    End Sub
+
+    <TestMethod> Public Sub TestParseUReal()
+        Domain.Current.Reset()
+        Domain.Current.SetDefaultSystem("metric")
+        Unit.Define("meter", "m", Prefix.One, "metric", Dimension.Length)
+        Quantity.Define("length", "l", Unit.Parse("m"), Nothing)
+
+        Dim u As UReal = Value.Parse("(length) (-1.123+-0.012)*10² m")
+        Dim v As UReal = Value.Parse("-1.123(12)e+2 m")
+        Debug.Print(u.SimilarTo(v).ToString)
+        Stop
     End Sub
 
 End Class

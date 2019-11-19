@@ -5,8 +5,8 @@ Namespace Values.Scalars
     <Value(Real.Match)>
     Public Class Real : Inherits Scalar(Of Real)
 
-        Public Const Match As String = "[+-]?[0-9]+(\.[0-9]+)?(([eE][+-]?[0-9]+)|([ ]*[\*·×][ ]*10((\^[+-][0-9]+)|([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+))))?"
-        Private ReadOnly _internal As Double
+        Public Const Match As String = "[+-]?[0-9]+(\.[0-9]+)?(([eE][+-]?[0-9]+)|([ ]*[\*·×]?[ ]*10((\^[+-]?[0-9]+)|([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+))))?"
+        Protected ReadOnly _internal As Double
 
         Public Sub New()
             Me.New(0.0)
@@ -104,7 +104,7 @@ Namespace Values.Scalars
             Return a.Power(Of Real, Scalar(Of Real))(b)
         End Operator
 
-        Public Function Absolute() As Real
+        Public Overridable Function Absolute() As Real
             Return New Real(Me.Quantity, Math.Abs(Me._internal), Me.Unit)
         End Function
 
@@ -156,6 +156,16 @@ Namespace Values.Scalars
                 End If
             End If
             Return retval
+        End Function
+
+        Public Function WithUncertainty(value As Real) As UReal
+            If Not Me.Unit.Dimension.Equals(value.Unit.Dimension) Then Throw New ArgumentException("Cannot add values with mismatching dimesnions.")
+            If Not value.Unit.Equals(Me.Unit) Then value = value.WithUnit(Me.Unit)
+            Return New UReal(Me.Quantity, Me._internal, value._internal, Me.Unit)
+        End Function
+
+        Public Function WithUncertainty() As UReal
+            Return New UReal(Me.Quantity, Me._internal, 0, Me.Unit)
         End Function
 
     End Class

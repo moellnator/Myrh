@@ -15,7 +15,7 @@ Namespace Values
             ).Select(
                 Function(t) New Tuple(Of Text.RegularExpressions.Regex, Parser)(
                     New Text.RegularExpressions.Regex(
-                        "^" & DirectCast(t.GetCustomAttributes(GetType(ValueAttribute), False).First, ValueAttribute).Pattern & "$",
+                        "^" & DirectCast(t.GetCustomAttributes(GetType(ValueAttribute), False).First, ValueAttribute).Pattern,
                         Text.RegularExpressions.RegexOptions.Compiled
                     ),
                     [Delegate].CreateDelegate(
@@ -49,13 +49,18 @@ Namespace Values
                 q = Quantity.Parse(m.ToString)
                 text = text.Substring(m.Length).Trim
             End If
+            Dim matching As Tuple(Of Text.RegularExpressions.Regex, Parser)() = MATCH_VALUE.Where(Function(m) m.Item1.IsMatch(text)).ToArray
+            Dim match As Tuple(Of Text.RegularExpressions.Regex, Parser) = matching.OrderByDescending(Function(m) m.Item1.Match(text).Length).First
+            Dim value As String = match.Item1.Match(text).ToString
+            text = text.Substring(value.Length).Trim
             Dim u As Unit = Nothing
-            If MATCH_UNIT.IsMatch(text) Then
-                Dim m As Text.RegularExpressions.Match = MATCH_UNIT.Match(text)
-                u = Unit.Parse(m.ToString)
-                text = text.Substring(0, text.Count - m.Length).Trim
+            If text.Length <> 0 Then
+                If MATCH_UNIT.IsMatch(text) Then
+                    Dim m As Text.RegularExpressions.Match = MATCH_UNIT.Match(text)
+                    u = Unit.Parse(m.ToString)
+                End If
             End If
-            Return MATCH_VALUE.First(Function(p) p.Item1.IsMatch(text)).Item2(text, q, u)
+            Return match.Item2(value, q, u)
         End Function
 
         Protected MustOverride Function _Parse(text As String, quantity As Quantity, unit As Unit) As Object

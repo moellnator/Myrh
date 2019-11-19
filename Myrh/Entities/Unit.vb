@@ -110,7 +110,7 @@ Namespace Entities
 
         Public ReadOnly Property IsDimensionless As Boolean
             Get
-                Return Me.Dimension.Equals(Dimension.One)
+                Return Me.Dimension.Simplified.Equals(Dimension.One)
             End Get
         End Property
 

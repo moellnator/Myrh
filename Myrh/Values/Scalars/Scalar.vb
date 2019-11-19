@@ -24,7 +24,7 @@ Namespace Values.Scalars
         End Function
 
         Public Overridable Function Divide(Of U As Scalar(Of U), V As Value(Of V))(other As U) As V
-            Return other.Scale(Of T, V)(Me.Power(Of Real, Scalar(Of T))(-1))
+            Return Me.Scale(Of T, V)(other.Power(Of Real, Scalar(Of T))(-1))
         End Function
 
         Public Function Power(Of U As Scalar(Of U), V As Value(Of V))(exponent As U) As V
