@@ -99,6 +99,7 @@
     <Compile Include="Values\Scalars\Complex.vb" />
     <Compile Include="Values\Scalars\Real.vb" />
     <Compile Include="Values\Scalars\Scalar.vb" />
+    <Compile Include="Values\Scalars\UComplex.vb" />
     <Compile Include="Values\Scalars\UReal.vb" />
     <Compile Include="Values\Value.vb" />
     <Compile Include="Values\ValueAttribute.vb" />

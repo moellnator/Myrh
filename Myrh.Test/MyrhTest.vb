@@ -219,4 +219,22 @@ Imports SimpleTexUnicode
         Stop
     End Sub
 
+    <TestMethod> Public Sub TestUComplex()
+        Dim ur As UReal = Value.Parse("-1.123(12)e+2")
+        Dim c As New Complex(2, 3)
+        Dim uc As UComplex = c / ur
+        uc *= 5
+        Debug.Print(uc.ToString)
+    End Sub
+
+    <TestMethod> Public Sub TestUComplexParse()
+        Domain.Current.Reset()
+        Domain.Current.SetDefaultSystem("metric")
+        Unit.Define("meter", "m", Prefix.One, "metric", Dimension.Length)
+        Quantity.Define("length", "l", Unit.Parse("m"), Nothing)
+
+        Dim uc As UComplex = Value.Parse("(length) (12.34(12)E+2 + -5.67(2) 10³ i) m")
+        Debug.Print(uc.ToString)
+    End Sub
+
 End Class

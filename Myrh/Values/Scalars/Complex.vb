@@ -6,8 +6,8 @@ Namespace Values.Scalars
     Public Class Complex : Inherits Scalar(Of Complex)
 
         Public Const Match As String = "((\(" & Real.Match & "[ ]*[+-][ ]*" & Real.Match & "[ ]*[\*·]?[i𝑖]\))|(" & Real.Match & "[ ]*[\*·]?[i𝑖]" & "))"
-        Private ReadOnly _real As Double
-        Private ReadOnly _imag As Double
+        Protected ReadOnly _real As Double
+        Protected ReadOnly _imag As Double
 
         Public ReadOnly Property Real As Real
             Get
@@ -65,10 +65,6 @@ Namespace Values.Scalars
             Me.New(quantity, c.Real, c.Imaginary, unit)
         End Sub
 
-        Public Shared Widening Operator CType(value As Double) As Complex
-            Return New Complex(value, 0.0)
-        End Operator
-
         Public Shared Widening Operator CType(value As Numerics.Complex) As Complex
             Return New Complex(value.Real, value.Imaginary)
         End Operator
@@ -76,12 +72,6 @@ Namespace Values.Scalars
         Public Shared Narrowing Operator CType(value As Complex) As Real
             If Not value._imag = 0 Then Throw New InvalidCastException("Cannot cast imaginary value to real.")
             Return New Real(value.Quantity, value._real, value.Unit)
-        End Operator
-
-        Public Shared Narrowing Operator CType(value As Complex) As Double
-            If Not value.Unit.IsDimensionless Then Throw New InvalidCastException("Cannot cast entity to Double: Dimension is not one.")
-            If Not value.Unit.IsDefault Then value = value.WithUnit(value.Unit.DefaultUnit)
-            Return CType(value, Real)
         End Operator
 
         Public Shared Narrowing Operator CType(value As Complex) As Numerics.Complex
@@ -229,8 +219,13 @@ Namespace Values.Scalars
                 sign = If(text(0) = "-"c, -1, 1)
                 text = text.Substring(1).Trim
             End If
-            text = text.Trim(" ", "*", "·", "i", "𝑖")
-            imag = Formatting.FromScientific(text) * sign
+            If text.Contains("i") Or text.Contains("𝑖") Then
+                text = text.Trim(" ", "*", "·", "i", "𝑖")
+                imag = Formatting.FromScientific(text) * sign
+            Else
+                real = Formatting.FromScientific(text)
+            End If
+
             Dim retval As Complex = Nothing
             If quantity IsNot Nothing Then
                 If unit IsNot Nothing Then
@@ -246,6 +241,20 @@ Namespace Values.Scalars
                 End If
             End If
             Return retval
+        End Function
+
+        Public Function WithUncertainty(value As Complex) As UComplex
+            If Not Me.Unit.Dimension.Equals(value.Unit.Dimension) Then Throw New ArgumentException("Cannot add values with mismatching dimesnions.")
+            If Not value.Unit.Equals(Me.Unit) Then value = value.WithUnit(Me.Unit)
+            Return New UComplex(Me.Quantity, Me._real, Me._imag, value._real, value._imag, Me.Unit)
+        End Function
+
+        Public Function WithUncertainty() As UReal
+            Return New UComplex(Me.Quantity, Me._real, Me._imag, 0, 0, Me.Unit)
+        End Function
+
+        Public Function Absolute() As Complex
+            Return New Complex(Me.Quantity, Math.Abs(Me._real), Math.Abs(Me._imag), Me.Unit)
         End Function
 
     End Class

@@ -8,9 +8,9 @@ Namespace Values.Scalars
 
         Private Const MatchExp As String = "(([eE][+-]?[0-9]+)|([ ]*[\*·×]?[ ]*10((\^[+-]?[0-9]+)|([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+))))?"
         Private Const MatchReal As String = "[0-9]+(\.[0-9]+)?"
-        Public Shadows Const Match As String = "([+-]?" & MatchReal & "\([0-9]+\)" & MatchExp & ")|" &
+        Public Shadows Const Match As String = "(([+-]?" & MatchReal & "\([0-9]+\)" & MatchExp & ")|" &
                                                "(\([+-]?" & MatchReal & "[ ]*(\+\-|±)[ ]*" & MatchReal & "\)" & MatchExp & ")|" &
-                                               "(\(" & Real.Match & "[ ]*(\+\-|±)[ ]*" & MatchReal & MatchExp & "\))"
+                                               "(\(" & Real.Match & "[ ]*(\+\-|±)[ ]*" & MatchReal & MatchExp & "\)))"
         Private ReadOnly _uncertain As Double
 
         Public ReadOnly Property Value As Real
@@ -60,23 +60,32 @@ Namespace Values.Scalars
             Return value._internal
         End Operator
 
+        Public Overloads Shared Widening Operator CType(value As UReal) As UComplex
+            Return New UComplex(value.Quantity, value._internal, 0, value._uncertain, 0, value.Unit)
+        End Operator
+
         Protected Overrides Function MakeEntity(quantity As Quantity, link As Link) As Value
-            Return New UReal(quantity, Me._internal * link.Scaling, Me._uncertain * link.Scaling, link.Target)
+            Return New UReal(quantity, Me._internal * link.Scaling, Math.Abs(Me._uncertain * link.Scaling), link.Target)
         End Function
 
         Protected Overrides Function _FormatValue() As String
             Dim retval As String = ""
-            Dim exponent As Double = Math.Floor(Math.Log10(Math.Abs(Me._internal)))
-            Dim exp_unc As Double = Math.Floor(Math.Log10(Math.Abs(Me._uncertain)))
-            Dim value As Double = Math.Round(CSng(Me._internal / 10 ^ exponent), Formatting.SignificantDigits - 1, MidpointRounding.AwayFromZero)
-            Dim unc As Double = Math.Round(CSng(Me._uncertain / 10 ^ exponent), Formatting.SignificantDigits - 1, MidpointRounding.AwayFromZero)
-            If exp_unc - exponent <= -1 Then
-                Dim s_unc As String = _FormatDouble(unc).Substring(exponent - exp_unc + 1)
-                retval = _FormatDouble(value) & "(" & s_unc & ")"
+            If Me._uncertain <> 0 Then
+                Dim exponent As Double = Math.Floor(Math.Log10(Math.Abs(Me._internal)))
+                Dim exp_unc As Double = Math.Floor(Math.Log10(Math.Abs(Me._uncertain)))
+                Dim value As Double = Math.Round(CSng(Me._internal / 10 ^ exponent), Formatting.SignificantDigits - 1, MidpointRounding.AwayFromZero)
+                Dim unc As Double = Math.Round(CSng(Me._uncertain / 10 ^ exponent), Formatting.SignificantDigits - 1, MidpointRounding.AwayFromZero)
+                If exp_unc - exponent <= -1 Then
+                    Dim s_unc As String = _FormatDouble(unc).Substring(exponent - exp_unc + 1)
+                    If s_unc = "" Then s_unc = "0"
+                    retval = _FormatDouble(value) & "(" & s_unc & ")"
+                Else
+                    retval = "(" & _FormatDouble(value) & " ± " & _FormatDouble(unc) & ")"
+                End If
+                retval &= If(exponent <> 0, SimpleTex.LatexToUnicode($"\times 10^{{{exponent}}}"), "")
             Else
-                retval = "(" & _FormatDouble(value) & " ± " & _FormatDouble(unc) & ")"
+                retval = Formatting.ToScientific(Me._internal)
             End If
-            retval &= If(exponent <> 0, SimpleTex.LatexToUnicode($"\times 10^{{{exponent}}}"), "")
             Return retval
         End Function
 
@@ -96,6 +105,14 @@ Namespace Values.Scalars
             Return b * a
         End Operator
 
+        Public Overloads Shared Operator *(a As UReal, b As Complex) As UComplex
+            Return CType(a, UComplex) * b
+        End Operator
+
+        Public Overloads Shared Operator *(a As Complex, b As UReal) As UComplex
+            Return a * CType(b, UComplex)
+        End Operator
+
         Public Overloads Shared Operator /(a As UReal, b As UReal) As UReal
             Return (a.Value / b.Value).WithUncertainty((a.Uncertainty / b.Value).Absolute + (a.Value * b.Uncertainty / b.Value ^ 2).Absolute)
         End Operator
@@ -106,6 +123,14 @@ Namespace Values.Scalars
 
         Public Overloads Shared Operator /(a As Real, b As UReal) As UReal
             Return (a / b.Value).WithUncertainty((a * b.Uncertainty / b.Value ^ 2).Absolute)
+        End Operator
+
+        Public Overloads Shared Operator /(a As UReal, b As Complex) As UComplex
+            Return CType(a, UComplex) / b
+        End Operator
+
+        Public Overloads Shared Operator /(a As Complex, b As UReal) As UComplex
+            Return a / CType(b, UComplex)
         End Operator
 
         Public Overloads Shared Operator +(a As UReal, b As UReal) As UReal
@@ -120,6 +145,14 @@ Namespace Values.Scalars
             Return (a + b.Value).WithUncertainty(b.Uncertainty)
         End Operator
 
+        Public Overloads Shared Operator +(a As UReal, b As Complex) As UComplex
+            Return CType(a, UComplex) + b
+        End Operator
+
+        Public Overloads Shared Operator +(a As Complex, b As UReal) As UComplex
+            Return a + CType(b, UComplex)
+        End Operator
+
         Public Overloads Shared Operator -(a As UReal, b As UReal) As UReal
             Return (a.Value - b.Value).WithUncertainty(a.Uncertainty + b.Uncertainty)
         End Operator
@@ -132,7 +165,15 @@ Namespace Values.Scalars
             Return (a - b.Value).WithUncertainty(b.Uncertainty)
         End Operator
 
-        Public Overloads Shared Operator ^(a As UReal, b As Real) As Real
+        Public Overloads Shared Operator -(a As UReal, b As Complex) As UComplex
+            Return CType(a, UComplex) - b
+        End Operator
+
+        Public Overloads Shared Operator -(a As Complex, b As UReal) As UComplex
+            Return a - CType(b, UComplex)
+        End Operator
+
+        Public Overloads Shared Operator ^(a As UReal, b As Real) As UReal
             Return (a.Value ^ b).WithUncertainty((b * a.Value ^ (b - 1.0)).Absolute)
         End Operator
 

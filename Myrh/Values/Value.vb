@@ -111,6 +111,10 @@ Namespace Values
 
         Protected MustOverride Function _Equals(Of U As Value(Of U))(other As U) As Boolean
 
+        Public Shared Operator -(a As Value(Of T)) As T
+            Return a.Scale(Of Real, T)(-1)
+        End Operator
+
     End Class
 
 End Namespace
