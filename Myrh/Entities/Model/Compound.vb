@@ -2,6 +2,7 @@
     Public MustInherit Class Compound(Of T As Compound(Of T)) : Implements IEnumerable(Of Component(Of T)), IEquatable(Of Compound(Of T)), INamed
 
         Protected ReadOnly _components As Component(Of T)()
+        Protected Shared ReadOnly _cache_alg As New Dictionary(Of String, T)
 
         Protected Sub New(components As IEnumerable(Of Component(Of T)))
             Me._components = components.GroupBy(
@@ -73,11 +74,25 @@
         End Function
 
         Public Shared Operator *(a As Compound(Of T), b As Compound(Of T)) As T
-            Return a.CreateNew(a._components.Concat(b._components))
+            Dim key As String = "(" & a.ToString & ")*(" & b.ToString & ")"
+            If _cache_alg.ContainsKey(key) Then
+                Return _cache_alg(key)
+            Else
+                Dim retval As T = a.CreateNew(a._components.Concat(b._components))
+                _cache_alg.Add(key, retval)
+                Return retval
+            End If
         End Operator
 
         Public Shared Operator ^(a As Compound(Of T), e As Double) As T
-            Return a.CreateNew(a.Select(Function(c) New Component(Of T)(c.Base, c.Exponent * e)))
+            Dim key As String = "(" & a.ToString & ")^" & e
+            If _cache_alg.ContainsKey(key) Then
+                Return _cache_alg(key)
+            Else
+                Dim retval As T = a.CreateNew(a.Select(Function(c) New Component(Of T)(c.Base, c.Exponent * e)))
+                _cache_alg.Add(key, retval)
+                Return retval
+            End If
         End Operator
 
         Public Overrides Function ToString() As String

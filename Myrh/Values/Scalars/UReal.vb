@@ -82,7 +82,7 @@ Namespace Values.Scalars
                 Else
                     retval = "(" & _FormatDouble(value) & " ± " & _FormatDouble(unc) & ")"
                 End If
-                retval &= If(exponent <> 0, SimpleTex.LatexToUnicode($"\times 10^{{{exponent}}}"), "")
+                retval &= If(exponent <> 0, SimpleTex.LatexToUnicode($"\times10^{{{exponent}}}"), "")
             Else
                 retval = Formatting.ToScientific(Me._internal)
             End If

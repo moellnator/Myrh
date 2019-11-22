@@ -65,7 +65,7 @@ Imports SimpleTexUnicode
         Domain.Current.SetDefaultSystem("metric")
         Unit.Define("gramm", "g", Prefix.Kilo, "metric", Dimension.Mass)
         Unit.Define("meter", "m", Prefix.One, "metric", Dimension.Length)
-        Unit.Define("time", "s", Prefix.One, "metric", Dimension.Length)
+        Unit.Define("time", "s", Prefix.One, "metric", Dimension.Time)
         Quantity.Define("length", "l", Unit.Parse("m"), Nothing)
         Quantity.Define("mass", "m", Unit.Parse("kg"), Nothing)
         Quantity.Define("time", "t", Unit.Parse("s"), Nothing)
@@ -167,13 +167,6 @@ Imports SimpleTexUnicode
 
     End Sub
 
-    <TestMethod> Public Sub TestSubGrouping()
-        Dim compound As String = "ABC"
-        For Each permutation In Model.Subset.All(compound)
-            Debug.Print(String.Join(",", permutation.Select(Function(g) "(" & New String(g.ToArray) & ")").ToArray))
-        Next
-    End Sub
-
     <TestMethod> Public Sub TestValueParsing()
         Domain.Current.Reset()
         Domain.Current.SetDefaultSystem("metric")
@@ -235,6 +228,12 @@ Imports SimpleTexUnicode
 
         Dim uc As UComplex = Value.Parse("(length) (12.34(12)E+2 + -5.67(2) 10³ i) m")
         Debug.Print(uc.ToString)
+    End Sub
+
+    <TestMethod> Public Sub TestMetricSystem()
+        Physics.System.FromName("metric")
+        Dim Z As UComplex = Value.Parse("((12.1+-0.1) + (9.2+-0.1)i) (Ohm)")
+        Debug.Print(Z.ToString)
     End Sub
 
 End Class

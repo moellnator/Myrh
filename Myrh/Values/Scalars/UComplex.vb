@@ -196,7 +196,7 @@ Namespace Values.Scalars
             Dim real As UReal = 0
             Dim sign As Integer = 1
             If text.Contains("(") Then
-                text = text.Trim("("c, ")"c)
+                text = text.Substring(text.IndexOf("(") + 1).Substring(0, text.LastIndexOf(")") - 1)
                 Dim ur As New Text.RegularExpressions.Regex("^" & UReal.Match)
                 Dim match As Text.RegularExpressions.Match = ur.Match(text)
                 text = text.Substring(match.Length)

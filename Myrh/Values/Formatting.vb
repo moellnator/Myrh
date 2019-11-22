@@ -14,7 +14,7 @@ Namespace Values
             value = Math.Round(value / 10 ^ exponent, SignificantDigits - shift - 1, MidpointRounding.AwayFromZero)
             Dim digits As Integer = Math.Max(SignificantDigits - (shift + 1), 0)
             Return String.Format(Globalization.CultureInfo.InvariantCulture, $"{{0:##0{If(digits <> 0, ".".PadRight(digits + 1, "0"c), "")}}}", value) &
-                If(exponent <> 0, SimpleTex.LatexToUnicode($"\times 10^{{{exponent}}}"), "")
+                If(exponent <> 0, SimpleTex.LatexToUnicode($"\times10^{{{exponent}}}"), "")
         End Function
 
         Public Shared Function FromScientific(text As String) As Double

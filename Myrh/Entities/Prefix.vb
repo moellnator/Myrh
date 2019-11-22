@@ -3,7 +3,6 @@
 Namespace Entities
     Public Class Prefix : Implements INamed : Implements IEquatable(Of Prefix)
 
-
         Public Shared ReadOnly Property Yotta As Prefix = New Prefix("Y", "yotta", 1.0E+24)
         Public Shared ReadOnly Property Zetta As Prefix = New Prefix("Z", "zetta", 1.0E+21)
         Public Shared ReadOnly Property Exa As Prefix = New Prefix("E", "exa", 1.0E+18)

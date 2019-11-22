@@ -23,8 +23,11 @@ Namespace Entities
                         Me.AssociatedUnit = definition.AssociatedUnit
                     End If
                     Me.Base = Me._get_base
+                    If Not Me.Base.AssociatedUnit.Dimension.Equals(Me.AssociatedUnit.Dimension) Then
+                        If Not Me.Base.AssociatedUnit.Dimension.Simplified.Equals(Me.AssociatedUnit.Dimension.Simplified) Then _
+                            Throw New Exception("Unit and quantity have different dimensions.")
+                    End If
                 End If
-
             End Sub
 
             Private Function _get_base() As Quantity

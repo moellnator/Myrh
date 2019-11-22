@@ -27,6 +27,9 @@ Namespace Entities
 
             Public ReadOnly Property DefaultUnit As Unit
                 Get
+                    Debug.Print(Domain.Current.DefaultSystem)
+                    Debug.Print(Me.System)
+                    Debug.Print(Me.System = Domain.Current.DefaultSystem)
                     If Me.System = Domain.Current.DefaultSystem Then Return Me.AsUnit
                     Dim roots As Unit() = Domain.Current.Units.Where(Function(u) u.AsAtom.RootName.Equals(Me.RootName) And u.AsAtom.System = Domain.Current.DefaultSystem).ToArray
                     If roots.Count <> 0 Then Return roots.First

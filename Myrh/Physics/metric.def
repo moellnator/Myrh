@@ -1,0 +1,74 @@
+﻿# Definition of metric unit system and SI base
+reset
+name metric
+default
+
+# SI base units
+u meter, m, , L
+q length, l, m, 
+u gramm, g, k, M
+q mass, m, kg, 
+u second, s, , T
+q time, t, s, 
+u Ampere, A, , I
+q electric current, I, A, 
+u Kelvin, K, , \theta
+q temperature, T, K, 
+u mole, mol, , N
+q amount of substance, n, mol, 
+u candela, cd, , J
+q luminous intensity, I_v, cd, 
+
+# SI compliant units and quantities
+u radian, rad, , L^0
+q angle, \phi, rad, (length)^0
+q area, A, , (length)^2
+u steradian, sr, , L^0
+q solid angle, \Omega, sr, (area)^0
+q volume, V, , (length)^3
+u Hertz, Hz, , T^{-1}
+q frequency, f, Hz, (time)^{-1}
+q velocity, v, , (length)(time)^{-1}
+q acceleration, a, , (length)(time)^{-2}
+q momentum, p, , (mass)(velocity)
+q mass density, \rho, , (mass)(volume)^{-1}
+u Newton, N, , M L T^{-2}
+q force, F, N, (mass)(acceleration)
+u Pascal, Pa, , M L^{-1} T^{-2}
+q pressure, p, Pa, (force)(area)^{-1}
+u Joule, J, , M L^2 T^{-2}
+q energy, E, J, (force)(length)
+u Watt, W, , M L^2 T^{-3}
+q power, P, W, (energy)(time)^{-1}
+q action, S, , (energy)(time)
+u Coulomb, C, , I T
+q electric charge, Q, C, (electric current)(time)
+u Volt, V, , M L^2 T^{-3} I^{-1}
+q voltage, U, V, (energy)(electric charge)^{-1}
+u Farad, F, , M^{-1} L^{-2} T^4 I^2
+u Ohm, \Omega, , M L^2 T^{-3} I^{-2}
+q electrical restistance, R, \Omega, (voltage)(electric current)^{-1}
+u Siemens, S, , M^{-1} L^{-2} T^3 I^2
+q electrical conductance, G, S, (electric current)(voltage)^{-1}
+u Weber, Wb, , M L^2 T^{-2} I^{-1}
+q magnetic flux, \Phi, Wb, (voltage)(time)
+u Tesla, T, , M T^{-2} I^{-1}
+q magnetic flux density, B, T, (magnetic flux)(area)^{-1}
+u Henry, H, , M L^2 T^{-2} I^{-2}
+q inductivity, L, H, (magnetic flux)(electric current)^{-1}
+u Lumen, lm, , J L^0
+q luminous flux, \Phi_v, lm, (luminous intensity)(solid angle)
+u Lux, lx, , J L^{-2}
+q illuminance, E_v, lx, (luminous intensity)(area)^{-1}
+u Becquerel, Bq, , T^{-1}
+q radioactivity, A, Bq, (time)^{-1}
+u Gray, Gy, , L^2 T^{-2}
+q energy dose, D, Gy, (energy)(mass)^{-1}
+u Sievert, Sv, , L^2 T^{-2}
+q equivalent dose, H, Sv, (energy)(mass)^{-1}
+u Katal, kat, , N T^{-1}
+q catalytic activity, a, kat, (amount of substance)(time)^{-1}
+q wave number, k, , (length)^{-1}
+q electric current density, J, , (electric current)(area)^{-1}
+q magnetic field strength, H, , (electric current)(length)^{-1}
+q amount of substance concentration, c, , (amount of substance)(volume)^{-1}
