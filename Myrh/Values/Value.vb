@@ -5,7 +5,7 @@ Namespace Values
 
     Public MustInherit Class Value : Inherits Entity(Of Value)
 
-        Private Const PATTERN_COMPOUND As String = "((\([\w-[\p{Nd}]]+\))|([\p{L}]+))(\^([+-]?[0-9]+(\.[0-9]+)?)|([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+(˙[⁰¹²³⁴⁵⁶⁷⁸⁹]+)?))?([ ·\*]((\([\w-[\p{Nd}]]+\))|([\p{L}]+))(\^([+-]?[0-9]+(\.[0-9]+)?)|([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+(˙[⁰¹²³⁴⁵⁶⁷⁸⁹]+)?))?)*"
+        Private Const PATTERN_COMPOUND As String = "((\([\- \w-[\p{Nd}]]+\))|([\p{L}]+))(\^([+-]?[0-9]+(\.[0-9]+)?)|([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+(˙[⁰¹²³⁴⁵⁶⁷⁸⁹]+)?))?([ ·\*]((\([\- \w-[\p{Nd}]]+\))|([\p{L}]+))(\^([+-]?[0-9]+(\.[0-9]+)?)|([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+(˙[⁰¹²³⁴⁵⁶⁷⁸⁹]+)?))?)*"
         Private Shared ReadOnly MATCH_QUANTITY As New Text.RegularExpressions.Regex("^" & PATTERN_COMPOUND, Text.RegularExpressions.RegexOptions.Compiled)
         Private Shared ReadOnly MATCH_UNIT As New Text.RegularExpressions.Regex(PATTERN_COMPOUND & "$", Text.RegularExpressions.RegexOptions.Compiled)
         Private Delegate Function Parser(text As String, quantity As Quantity, unit As Unit) As Object

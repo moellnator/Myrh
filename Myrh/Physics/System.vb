@@ -26,6 +26,8 @@ Namespace Physics
             Select Case name
                 Case "metric"
                     FromDescription(My.Resources.metric)
+                Case "atomic-ext"
+                    FromDescription(My.Resources.atomic_ext)
                 Case Else
                     Throw New Exception($"Resource {name} not found.")
             End Select
@@ -62,8 +64,14 @@ Namespace Physics
                     Case "l", "link"
                         Link.Define(
                             Unit.Parse(SimpleTex.LatexToUnicode(parts(0))).AsAtom,
-                            Unit.Parse(SimpleTex.LatexToUnicode(parts(1))).AsAtom,
+                            Unit.Parse(SimpleTex.LatexToUnicode(parts(1))),
                             Values.Formatting.FromScientific(parts(2))
+                        )
+                    Case "c", "constant"
+                        Constant.Define(
+                            SimpleTex.LatexToUnicode(parts(0)),
+                            SimpleTex.LatexToUnicode(parts(1)),
+                            DirectCast(Values.Value.Parse(SimpleTex.LatexToUnicode(parts(2))), Values.Value)
                         )
                     Case "#"
                     Case Else

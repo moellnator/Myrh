@@ -95,6 +95,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Physics\Constant.vb" />
     <Compile Include="Physics\System.vb" />
     <Compile Include="Values\Formatting.vb" />
     <Compile Include="Values\Scalars\Complex.vb" />
@@ -125,6 +126,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Physics\atomic_ext.def" />
     <Content Include="Physics\metric.def" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

@@ -3,6 +3,8 @@
 Namespace Entities
     Public Class Unit : Inherits Compound(Of Unit)
 
+        Private Shared ReadOnly _cache_parse As New Dictionary(Of String, Unit)
+
         Public Class Atom : Inherits Atom(Of Unit)
 
             Public ReadOnly Property Prefix As Prefix
@@ -27,9 +29,6 @@ Namespace Entities
 
             Public ReadOnly Property DefaultUnit As Unit
                 Get
-                    Debug.Print(Domain.Current.DefaultSystem)
-                    Debug.Print(Me.System)
-                    Debug.Print(Me.System = Domain.Current.DefaultSystem)
                     If Me.System = Domain.Current.DefaultSystem Then Return Me.AsUnit
                     Dim roots As Unit() = Domain.Current.Units.Where(Function(u) u.AsAtom.RootName.Equals(Me.RootName) And u.AsAtom.System = Domain.Current.DefaultSystem).ToArray
                     If roots.Count <> 0 Then Return roots.First
@@ -68,42 +67,51 @@ Namespace Entities
         End Sub
 
         Public Shared Shadows Function Parse(text As String) As Unit
-            Dim retval As New List(Of Unit)
-            For Each component As Tuple(Of String, Double) In Compound(Of Unit).Parse(text)
-                Dim base_name As String = component.Item1
-                Dim is_name As String = base_name.Contains("(")
-                Dim base As Unit = Domain.Current.Units.FirstOrDefault(Function(d) base_name = If(base_name.Contains("("), d.Name, d.Symbol))
-                If base Is Nothing Then
-                    Dim prefix As Prefix = Prefix.HasPrefix(base_name)
-                    If prefix Is Nothing Then
-                        prefix = Prefix.One
-                    Else
-                        base_name = If(is_name, "(" & base_name.Substring(1 + prefix.Name.Count).Trim, base_name.Substring(prefix.Symbol.Count))
-                    End If
-                    base = Domain.Current.Units.First(
-                        Function(d) base_name = If(
-                            base_name.Contains("("),
-                            d.AsAtom.RootName,
-                            d.Symbol.Substring(d.AsAtom.Prefix.Symbol.Count)
-                         )
-                    )
-                    base = New Unit(
-                        base.AsAtom.RootName.Trim("("c, ")"c),
-                        base.Symbol.Substring(base.AsAtom.Prefix.Symbol.Count),
-                        prefix,
-                        base.AsAtom.System & "+" & prefix.Name,
-                        base.Dimension
-                    )
-                    If Not Domain.Current.Links.Any(
-                            Function(link) link.Source.Name.Equals(base.Name) And link.Target.AsAtom.System.Equals(Domain.Current.DefaultSystem)
+            Dim retval As Unit = Nothing
+            If _cache_parse.ContainsKey(text) Then
+                retval = _cache_parse(text)
+            Else
+                Dim retlist As New List(Of Unit)
+                For Each component As Tuple(Of String, Double) In Compound(Of Unit).Parse(text)
+                    Dim base_name As String = component.Item1
+                    Dim is_name As String = base_name.Contains("(")
+                    Dim base As Unit = Domain.Current.Units.FirstOrDefault(Function(d) base_name = If(base_name.Contains("("), d.Name, d.Symbol))
+                    If base Is Nothing Then
+                        Dim prefix As Prefix = Prefix.HasPrefix(base_name)
+                        If prefix Is Nothing Then
+                            prefix = Prefix.One
+                        Else
+                            base_name = If(is_name, "(" & base_name.Substring(1 + prefix.Name.Count).Trim, base_name.Substring(prefix.Symbol.Count))
+                        End If
+                        base = Domain.Current.Units.First(
+                            Function(d) base_name = If(
+                                base_name.Contains("("),
+                                d.AsAtom.RootName,
+                                d.Symbol.Substring(d.AsAtom.Prefix.Symbol.Count)
+                            )
+                        )
+                        Dim prefixed As New Unit(
+                            base.AsAtom.RootName.Trim("("c, ")"c),
+                            base.Symbol.Substring(base.AsAtom.Prefix.Symbol.Count),
+                            prefix,
+                            base.AsAtom.System & "+" & prefix.Name,
+                            base.Dimension
+                        )
+                        If Not Domain.Current.Links.Any(
+                            Function(link) link.Source.Name.Equals(prefixed.Name) And link.Target.All(Function(t) DirectCast(t.Base, Atom).System.Equals(Domain.Current.DefaultSystem))
                         ) Then
-                        Dim defaultAtom As Atom = base.DefaultUnit.AsAtom
-                        Link.Define(base.AsAtom, defaultAtom, prefix.Value / defaultAtom.Prefix.Value)
+                            Dim defaultUnit As Unit = base.DefaultUnit
+                            Dim defaultLink As Link = Link.Make(base, defaultUnit)
+                            Link.Define(prefixed.AsAtom, defaultUnit, prefix.Value / base.AsAtom.Prefix.Value * defaultLink.Scaling)
+                        End If
+                        base = prefixed
                     End If
-                End If
-                retval.Add(base ^ component.Item2)
-            Next
-            Return New Unit(retval.SelectMany(Function(d) d))
+                    retlist.Add(base ^ component.Item2)
+                Next
+                retval = New Unit(retlist.SelectMany(Function(d) d))
+                _cache_parse.Add(text, retval)
+            End If
+            Return retval
         End Function
 
         Public Function AsAtom() As Atom

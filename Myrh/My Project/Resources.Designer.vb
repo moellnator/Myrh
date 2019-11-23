@@ -63,6 +63,39 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized string similar to .
         '''</summary>
+        Friend ReadOnly Property atomic_ext() As String
+            Get
+                Return ResourceManager.GetString("atomic_ext", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to # Definition of metric unit system and SI base
+        '''reset
+        '''name metric
+        '''default
+        '''
+        '''# SI base units
+        '''u meter, m, , L
+        '''q length, l, m, 
+        '''u gramm, g, k, M
+        '''q mass, m, kg, 
+        '''u second, s, , T
+        '''q time, t, s, 
+        '''u Ampere, A, , I
+        '''q electric current, I, A, 
+        '''u Kelvin, K, , \theta
+        '''q temperature, T, K, 
+        '''u mole, mol, , N
+        '''q amount of substance, n, mol, 
+        '''u candela, cd, , J
+        '''q luminous intensity, I_v, cd, 
+        '''
+        '''# SI compliant units and quantities
+        '''u radian, rad, , L^0
+        '''q angle, \phi, rad, (length)^0
+        '''q area, A, , (length)^2 [rest of string was truncated]&quot;;.
+        '''</summary>
         Friend ReadOnly Property metric() As String
             Get
                 Return ResourceManager.GetString("metric", resourceCulture)

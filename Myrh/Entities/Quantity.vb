@@ -3,6 +3,9 @@
 Namespace Entities
     Public Class Quantity : Inherits Compound(Of Quantity)
 
+        Private Shared ReadOnly _cache_parse As New Dictionary(Of String, Quantity)
+        Private Shared ReadOnly _cache_infer As New Dictionary(Of Unit, Quantity)
+
         Public Class Atom : Inherits Atom(Of Quantity)
 
             Public ReadOnly Property Base As Quantity
@@ -109,24 +112,36 @@ Namespace Entities
 
         Public Shared Shadows Function Parse(text As String) As Quantity
             Dim retval As Quantity = None
-            For Each component As Tuple(Of String, Double) In Compound(Of Quantity).Parse(text)
-                Dim defined As Quantity = Domain.Current.Quantities.First(Function(c) component.Item1.Equals(If(component.Item1.Contains("("), c.Name, c.Symbol)))
-                retval *= defined ^ component.Item2
-            Next
+            If _cache_parse.ContainsKey(text) Then
+                retval = _cache_parse(text)
+            Else
+                For Each component As Tuple(Of String, Double) In Compound(Of Quantity).Parse(text)
+                    Dim defined As Quantity = Domain.Current.Quantities.First(Function(c) component.Item1.Equals(If(component.Item1.Contains("("), c.Name, c.Symbol)))
+                    retval *= defined ^ component.Item2
+                Next
+                _cache_parse.Add(text, retval)
+            End If
             Return retval
         End Function
 
         Public Shared Function InferFrom(unit As Unit) As Quantity
-            Dim candidates As Quantity() = Domain.Current.Quantities.Where(Function(q) q.AssociatedUnit.Equals(unit) Or q.AssociatedUnit.Equals(unit.DefaultUnit)).ToArray
-            If candidates.Count = 0 Then
-                Dim q_full As Quantity = unit.Select(Function(c) InferFrom(DirectCast(c.Base, Unit.Atom).AsUnit) ^ c.Exponent).Aggregate(None, Function(a, b) a * b)
-                While _Length(q_full.Definition) < _Length(q_full)
-                    q_full = q_full.Definition.Simplified
-                End While
-                Return q_full
+            Dim retval As Quantity = Nothing
+            If _cache_infer.ContainsKey(unit) Then
+                retval = _cache_infer(unit)
             Else
-                Return candidates.First
+                Dim candidates As Quantity() = Domain.Current.Quantities.Where(Function(q) q.AssociatedUnit.Equals(unit) Or q.AssociatedUnit.Equals(unit.DefaultUnit)).ToArray
+                If candidates.Count = 0 Then
+                    Dim q_full As Quantity = unit.Select(Function(c) InferFrom(DirectCast(c.Base, Unit.Atom).AsUnit) ^ c.Exponent).Aggregate(None, Function(a, b) a * b)
+                    While _Length(q_full.Definition) < _Length(q_full)
+                        q_full = q_full.Definition.Simplified
+                    End While
+                    retval = q_full
+                Else
+                    retval = candidates.First
+                End If
+                _cache_infer.Add(unit, retval)
             End If
+            Return retval
         End Function
 
         Private Shared Function _Length(q As Quantity) As Double

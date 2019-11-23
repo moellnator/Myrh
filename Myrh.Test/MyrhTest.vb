@@ -88,7 +88,7 @@ Imports SimpleTexUnicode
 
         Unit.Define("meter", "m", Prefix.One, "metric", Dimension.Length)
         Unit.Define("bla", "b", Prefix.One, "blanit", Dimension.Length)
-        Link.Define(Unit.Parse("b").AsAtom, Unit.Parse("m").AsAtom, 0.01)
+        Link.Define(Unit.Parse("b").AsAtom, Unit.Parse("m"), 0.01)
 
         Dim u As Unit = Unit.Parse("b")
         Debug.Print(u.DefaultUnit.ToString)
@@ -99,7 +99,7 @@ Imports SimpleTexUnicode
         Domain.Current.SetDefaultSystem("metric")
 
         Unit.Define("percent", "%", Prefix.One, "fraction", Dimension.One)
-        Link.Define(Unit.Parse("%").AsAtom, Unit.Empty.AsAtom, 0.01)
+        Link.Define(Unit.Parse("%").AsAtom, Unit.Empty, 0.01)
         Quantity.Define("probability", "p", Unit.Empty, Nothing)
 
         Dim p As New Real(Quantity.Parse("p"), 51.257, Unit.Parse("%"))
@@ -234,6 +234,26 @@ Imports SimpleTexUnicode
         Physics.System.FromName("metric")
         Dim Z As UComplex = Value.Parse("((12.1+-0.1) + (9.2+-0.1)i) (Ohm)")
         Debug.Print(Z.ToString)
+    End Sub
+
+    <TestMethod> Public Sub TestConstant()
+        Physics.System.FromName("metric")
+        Dim c As Physics.Constant = Physics.Constant.Parse(SimpleTex.LatexToUnicode("\mu_B"))
+        Debug.Print((c.Value * c.Value).ToString)
+    End Sub
+
+    <TestMethod> Public Sub TestAtomicSystem()
+        Physics.System.FromName("metric")
+        Physics.System.FromName("atomic-ext")
+        Dim Ry As Physics.Constant = Physics.Constant.Parse(SimpleTex.LatexToUnicode("Ry"))
+        Dim c As Physics.Constant = Physics.Constant.Parse(SimpleTex.LatexToUnicode("c"))
+        Dim m_p As Physics.Constant = Physics.Constant.Parse(SimpleTex.LatexToUnicode("m_p"))
+        Dim m_e As Physics.Constant = Physics.Constant.Parse("<electron mass>")
+        Dim a_0 As Physics.Constant = Physics.Constant.Parse("<Bohr radius>")
+        Debug.Print(Ry.Value.WithUnit(Unit.Parse("eV")).ToString)
+        Debug.Print(m_e.Value.WithUnit(Unit.Parse("MeV c^-2")).ToString)
+        Debug.Print((m_p.Value + m_e.Value).WithUnit(Unit.Parse("u")).ToString)
+        Debug.Print(a_0.Value.WithUnit(Unit.Parse("(Angstrom)")).ToString)
     End Sub
 
 End Class

@@ -32,13 +32,15 @@ Namespace Entities
         End Function
 
         Public Shared Operator &(a As Link, b As Link) As Link
-            If Not a.Target.Equals(b.Source) Then Throw New Exception("Unable to combine links with different reference system.")
+            If Not a.Target.Dimension.Equals(b.Source.Dimension) _
+                AndAlso Not a.Target.Dimension.Simplified.Equals(b.Source.Dimension.Simplified) Then _
+                Throw New Exception("Unable to combine links with different reference system.")
             Return New Link(a.Source, b.Target, a.Scaling * b.Scaling)
         End Operator
 
-        Public Shared Sub Define(source As Unit.Atom, target As Unit.Atom, scaling As Double)
-            Dim l As New Link(source.AsUnit, target.AsUnit, scaling)
-            If Not target.System = Domain.Current.DefaultSystem Then Throw New ArgumentException("Link must point to a unit of the default system.")
+        Public Shared Sub Define(source As Unit.Atom, target As Unit, scaling As Double)
+            Dim l As New Link(source.AsUnit, target, scaling)
+            If Not target.All(Function(q) DirectCast(q.Base, Unit.Atom).System = Domain.Current.DefaultSystem) Then Throw New ArgumentException("Link must point to a unit of the default system.")
             If Domain.Current.Links.Any(Function(link) link.Source.Equals(source)) Then Throw New Exception("Link does already exist.")
             Domain.Current.Links.Add(l)
         End Sub

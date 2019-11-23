@@ -15,7 +15,9 @@
         End Sub
 
         Public Sub New(quantity As Quantity, unit As Unit)
-            If Not quantity.AssociatedUnit.Dimension.Equals(unit.Dimension) Then Throw New ArgumentException("Unit does not match dimension of quantity.")
+            If Not quantity.AssociatedUnit.Dimension.Equals(unit.Dimension) _
+                AndAlso Not quantity.AssociatedUnit.Dimension.Simplified.Equals(unit.Dimension.Simplified) Then _
+                Throw New ArgumentException("Unit does not match dimension of quantity.")
             Me.Quantity = quantity
             Me.Unit = unit
         End Sub

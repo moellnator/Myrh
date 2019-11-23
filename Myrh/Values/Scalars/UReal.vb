@@ -76,7 +76,12 @@ Namespace Values.Scalars
                 Dim value As Double = Math.Round(CSng(Me._internal / 10 ^ exponent), Formatting.SignificantDigits - 1, MidpointRounding.AwayFromZero)
                 Dim unc As Double = Math.Round(CSng(Me._uncertain / 10 ^ exponent), Formatting.SignificantDigits - 1, MidpointRounding.AwayFromZero)
                 If exp_unc - exponent <= -1 Then
-                    Dim s_unc As String = _FormatDouble(unc).Substring(exponent - exp_unc + 1)
+                    Dim s_unc As String = _FormatDouble(unc)
+                    If exponent - exp_unc + 1 < s_unc.Count Then
+                        s_unc = s_unc.Substring(exponent - exp_unc + 1)
+                    Else
+                        s_unc = ""
+                    End If
                     If s_unc = "" Then s_unc = "0"
                     retval = _FormatDouble(value) & "(" & s_unc & ")"
                 Else
