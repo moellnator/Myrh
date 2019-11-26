@@ -256,4 +256,11 @@ Imports SimpleTexUnicode
         Debug.Print(a_0.Value.WithUnit(Unit.Parse("(Angstrom)")).ToString)
     End Sub
 
+    <TestMethod> Public Sub TestConstantParsing()
+        Physics.System.FromName("metric")
+        Dim text As String = "<speed of light>"
+        Dim c As Physics.Constant = Physics.Constant.Parse(text)
+
+    End Sub
+
 End Class

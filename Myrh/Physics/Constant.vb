@@ -48,7 +48,12 @@ Namespace Physics
         Public Shared Function Parse(text As String) As Constant
             Dim retval As Constant = Nothing
             If text.Contains("<") Then
-                retval = _Constants(text.Trim("<"c, ">"c))
+                text = text.Trim("<"c, ">"c)
+                If _Constants.ContainsKey(text) Then
+                    retval = _Constants(text)
+                Else
+                    Throw New NotImplementedException
+                End If
             Else
                 retval = _Constants.Values.First(Function(c) c.Symbol = text)
             End If
@@ -57,6 +62,27 @@ Namespace Physics
 
         Public Overrides Function ToString() As String
             Return Me.Name & " = " & Me.Value.ToString
+        End Function
+
+        Private Shared Function LevenshteinDistance(ByVal s As String, ByVal t As String) As Integer
+            Dim n As Integer = s.Length
+            Dim m As Integer = t.Length
+            Dim d As Integer(,) = New Integer(n, m) {}
+            If n = 0 Or m = 0 Then Return m
+            Dim i As Integer = 0
+            For i = 0 To n
+                d(i, 0) = i
+            Next
+            For j = 0 To m
+                d(0, j) = j
+            Next
+            For i = 1 To n
+                For j = 1 To m
+                    Dim cost As Integer = If((t(j - 1) = s(i - 1)), 0, 1)
+                    d(i, j) = Math.Min(Math.Min(d(i - 1, j) + 1, d(i, j - 1) + 1), d(i - 1, j - 1) + cost)
+                Next
+            Next
+            Return d(n, m)
         End Function
 
     End Class
