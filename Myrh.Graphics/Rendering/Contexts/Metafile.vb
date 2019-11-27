@@ -8,7 +8,7 @@ Namespace Rendering.Contexts
         End Function
 
         Private _metafile As Imaging.Metafile
-        Private _bitmap As Image
+        Private _bitmap As Drawing.Bitmap
         Private _bmp_grfx As Drawing.Graphics
 
         Public Overrides ReadOnly Property DefaultExtension As String
@@ -34,8 +34,10 @@ Namespace Rendering.Contexts
         End Sub
 
         Protected Overrides Function CreateGraphics() As Drawing.Graphics
-            Dim bounds As New Rectangle(0, 0, Math.Round(Me.Size.Width) / 2, Math.Round(Me.Size.Height) / 2)
-            Me._bitmap = New Drawing.Bitmap(bounds.Width * 2, bounds.Height * 2, Imaging.PixelFormat.Format32bppArgb)
+            Dim size As New Size(Math.Round(Me.Setup.Device.Width), Math.Round(Me.Setup.Device.Height))
+            Dim bounds As New Rectangle(0, 0, Math.Round(size.Width), Math.Round(size.Height))
+            Me._bitmap = New Drawing.Bitmap(bounds.Width, bounds.Height, Imaging.PixelFormat.Format32bppArgb)
+            Me._bitmap.SetResolution(Me.Setup.DPI, Me.Setup.DPI)
             Dim grfx As Drawing.Graphics = Drawing.Graphics.FromImage(Me._bitmap)
             Dim hdc As IntPtr = grfx.GetHdc
             Me._metafile = New Imaging.Metafile(hdc, bounds, Imaging.MetafileFrameUnit.Pixel, Imaging.EmfType.EmfPlusOnly, "...")

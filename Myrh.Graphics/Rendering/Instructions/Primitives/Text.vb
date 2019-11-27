@@ -34,6 +34,7 @@ Namespace Rendering.Instructions.Primitives
             Me.Color = Color
             Me.Font = Font
             Me.Alignment = Alignment
+            Me.Rotation = Rotation
         End Sub
 
         Public Overrides Sub Execute(Engine As Engine, context As Context)

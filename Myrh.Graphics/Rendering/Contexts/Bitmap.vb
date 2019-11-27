@@ -20,7 +20,9 @@ Namespace Rendering.Contexts
         End Sub
 
         Protected Overrides Function CreateGraphics() As Drawing.Graphics
-            Me._bitmap = New Drawing.Bitmap(Me.Size.Width, Me.Size.Height, Imaging.PixelFormat.Format32bppArgb)
+            Dim size As New Size(Math.Round(Me.Setup.Device.Width), Math.Round(Me.Setup.Device.Height))
+            Me._bitmap = New Drawing.Bitmap(size.Width, size.Height, Imaging.PixelFormat.Format32bppArgb)
+            Me._bitmap.SetResolution(Me.Setup.DPI, Me.Setup.DPI)
             Return Drawing.Graphics.FromImage(Me._bitmap)
         End Function
 

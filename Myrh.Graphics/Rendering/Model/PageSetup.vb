@@ -56,6 +56,14 @@ Namespace Rendering.Model
             )
         End Function
 
+        Public Function Resolution(dpi As Double) As PageSetup
+            Return New PageSetup(
+                Me.Size,
+                Me.PageCropping,
+                dpi
+            )
+        End Function
+
     End Class
 
 End Namespace

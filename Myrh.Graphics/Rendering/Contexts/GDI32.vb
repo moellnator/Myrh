@@ -5,7 +5,7 @@ Namespace Rendering.Contexts
     Public MustInherit Class GDI32 : Inherits Context
 
         Private ReadOnly _graphics As Drawing.Graphics
-        Protected ReadOnly Size As Size
+        Protected ReadOnly Setup As PageSetup
 
         Public Sub New(setup As PageSetup)
             MyBase.New(
@@ -16,7 +16,7 @@ Namespace Rendering.Contexts
                     setup.Device.Height / 2
                 )
             )
-            Me.Size = New Size(Math.Round(setup.Device.Width), Math.Round(setup.Device.Height))
+            Me.Setup = setup
             Me._graphics = Me.CreateGraphics()
             Me._graphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
             Me._graphics.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAlias
@@ -34,7 +34,33 @@ Namespace Rendering.Contexts
         End Sub
 
         Public Overrides Sub Primitive(text As Text, engine As Engine)
-            Throw New NotImplementedException()
+            Dim font_size As Single = text.Font.SizeInPoints / 72 * Setup.DPI
+            Dim font As New Font(text.Font.FontFamily, font_size, text.Font.Style, GraphicsUnit.Pixel)
+            Dim a As Double = text.Rotation / 180 * Math.PI
+            Dim text_size As SizeF = Me._graphics.MeasureString(text.Text, font)
+            Dim text_size_tr As New SizeF(
+                Math.Abs(text_size.Width * Math.Cos(a) + text_size.Height * Math.Sin(a)),
+                Math.Abs(text_size.Height * Math.Cos(a) + text_size.Width * Math.Sin(a))
+            )
+            Dim origin As Vertex = engine.Pipeline(text.Origin, Me.Display)
+            Dim brush As New SolidBrush(text.Color)
+            Select Case text.Alignment.Horizontal
+                Case Text.TextAlignment.HAlignments.Center
+                    origin = origin - New Vertex(text_size_tr.Width / 2, 0)
+                Case Text.TextAlignment.HAlignments.Right
+                    origin = origin - New Vertex(text_size_tr.Width, 0)
+            End Select
+            Select Case text.Alignment.Vertical
+                Case Text.TextAlignment.VAlignments.Center
+                    origin = origin - New Vertex(0, text_size_tr.Height / 2)
+                Case Text.TextAlignment.VAlignments.Bottom
+                    origin = origin - New Vertex(0, text_size_tr.Height)
+            End Select
+            origin += New Vertex(text_size_tr.Width, text_size_tr.Height) * 0.5
+            Me._graphics.TranslateTransform(origin.X, origin.Y)
+            Me._graphics.RotateTransform(text.Rotation)
+            Me._graphics.DrawString(text.Text, font, brush, New PointF(-text_size.Width / 2, -text_size.Height / 2))
+            Me._graphics.ResetTransform()
         End Sub
 
         Public Overrides Sub Primitive(filled As Filled, engine As Engine)
