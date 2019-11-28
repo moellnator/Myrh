@@ -16,6 +16,10 @@ Namespace Rendering.Contexts
                     retval = New Bitmap(setup)
                 Case GetType(Metafile)
                     retval = New Metafile(setup)
+                Case GetType(Vectormap)
+                    retval = New Vectormap(setup)
+                Case GetType(DocumentFile)
+                    retval = New DocumentFile(setup)
                 Case Else
                     Throw New InvalidOperationException("Unkown context type provided for class creation.")
             End Select
@@ -34,6 +38,17 @@ Namespace Rendering.Contexts
             End Get
         End Property
 
+        Public Shared ReadOnly Property Vectormap As ContextFactory
+            Get
+                Return New ContextFactory(GetType(Vectormap))
+            End Get
+        End Property
+
+        Public Shared ReadOnly Property DocumentFile As ContextFactory
+            Get
+                Return New ContextFactory(GetType(DocumentFile))
+            End Get
+        End Property
     End Class
 
 End Namespace

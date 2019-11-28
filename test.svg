@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="11.7in" height="8.3in" viewBox="0 0 3510 2490">
+  <polyline points="1755, 1245, 2377.5, 622.5" fill="none" stroke-width="2pt" stroke="#FF0000" stroke-opacity="1" stroke-dasharray="" stroke-linecap="round" />
+  <text x="0" y="0" style="font-family: Arial;font-size: 78 px;stroke: none;fill: #00FFFF;" opacity="1" text-anchor="start" dominant-baseline="hanging" transform="translate(2377.5 622.5) rotate(180,92,37.5)">Hello</text>
+  <ellipse cx="1755" cy="1245" rx="24.90002" ry="24.90002" fill="#00FF00" opacity="1" stroke-width="2 pt" stroke="#808080" stroke-opacity="1" stroke-dasharray="" />
+</svg>

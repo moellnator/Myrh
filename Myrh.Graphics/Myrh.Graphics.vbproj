@@ -46,6 +46,12 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PdfSharp, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.Charting.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -74,9 +80,11 @@
     <Compile Include="Rendering\Contexts\Buffer.vb" />
     <Compile Include="Rendering\Contexts\Context.vb" />
     <Compile Include="Rendering\Contexts\ContextFactory.vb" />
+    <Compile Include="Rendering\Contexts\DocumentFile.vb" />
     <Compile Include="Rendering\Contexts\GDI32.vb" />
     <Compile Include="Rendering\Contexts\IContextFactory.vb" />
     <Compile Include="Rendering\Contexts\Metafile.vb" />
+    <Compile Include="Rendering\Contexts\Vectormap.vb" />
     <Compile Include="Rendering\Document.vb" />
     <Compile Include="Rendering\Engine.vb" />
     <Compile Include="Rendering\Instructions\ClearModelView.vb" />
@@ -146,6 +154,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />

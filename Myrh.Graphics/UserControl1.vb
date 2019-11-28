@@ -7,9 +7,9 @@ Imports Myrh.Graphics.Rendering.Instructions
 
 Public Class UserControl1
     Private Sub UserControl1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim page As PageSetup = PageSetup.DIN.A4.Flipped.Resolution(50)
+        Dim page As PageSetup = PageSetup.DIN.A4.Flipped
         Dim doc As New Document("test", page, ModelView.Default, New P2DFlat(page.AspectRatio, 1.0))
-        doc.AttachContexts({ContextFactory.Bitmap, ContextFactory.MetaFile})
+        doc.AttachContexts({ContextFactory.Bitmap, ContextFactory.MetaFile, ContextFactory.Vectormap, ContextFactory.DocumentFile})
 
         Dim instructions As New List(Of Instruction) From {
             New ClearModelView,
@@ -18,12 +18,20 @@ Public Class UserControl1
                 New Vertex(0.5, 0.5),
                 "Hello",
                 Color.FromARGB(255, 0, 255, 255),
-                New Font("Arial", 12.0F, FontStyle.Regular, GraphicsUnit.Point),
+                New Font("Arial", 16.0F, FontStyle.Regular, GraphicsUnit.Point),
                 New Primitives.Text.TextAlignment(
                     Primitives.Text.TextAlignment.HAlignments.Left,
                     Primitives.Text.TextAlignment.VAlignments.Top
                 ),
                 180
+            ),
+            New Primitives.Filled(
+                {New Vertex(-0.02, 0.02), New Vertex(0.02, -0.02)},
+                Primitives.Filled.FillTypes.Circle,
+                Color.FromARGB(255, 0, 255, 0),
+                Color.FromARGB(255, 128, 128, 128),
+                2.0F,
+                {1.0F}
             )
         }
         doc.Execute(instructions)
